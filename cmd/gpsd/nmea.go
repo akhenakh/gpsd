@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"io"
 	"log"
-	"strings"
 
 	nmea "github.com/adrianmo/go-nmea"
 	"github.com/akhenakh/gpsd/gpssvc"
@@ -24,20 +23,10 @@ $GPGLL,4647.87042,N,07114.17012,W,002503.00,A,D*74
 
 // parseNMEA parse NMEA lines close the channel on EOF
 func parseNMEA(r io.Reader, pchan chan *gpssvc.Position) error {
-	br := bufio.NewReader(r)
+	sc := bufio.NewScanner(r)
 	pos := &gpssvc.Position{}
-	for {
-		line, err := br.ReadString('\n')
-		if err == io.EOF {
-			return io.EOF
-		}
-		if err != nil {
-			log.Println("error reading", err, line)
-			continue
-		}
-
-		line = strings.Trim(line, "\r\n")
-
+	for sc.Scan() {
+		line := sc.Text()
 		s, err := nmea.Parse(line)
 		if err != nil {
 			log.Println("error parsing", err, line)
@@ -70,5 +59,5 @@ func parseNMEA(r io.Reader, pchan chan *gpssvc.Position) error {
 		}
 	}
 
-	return nil
+	return sc.Err()
 }
