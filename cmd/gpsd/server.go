@@ -107,10 +107,12 @@ func (s *Server) Start() {
 	}()
 }
 
+// Stop the server
 func (s *Server) Stop() {
 	s.quit <- struct{}{}
 }
 
+// LivePosition streams Position updates
 func (s *Server) LivePosition(empty *google_protobuf.Empty, stream gpssvc.GPSSVC_LivePositionServer) error {
 	c := make(chan (*gpssvc.Position), 1)
 	s.Lock()
@@ -139,4 +141,15 @@ func (s *Server) LivePosition(empty *google_protobuf.Empty, stream gpssvc.GPSSVC
 	close(c)
 	s.Unlock()
 	return nil
+}
+
+// InjectPosition Inject fake position
+// use it for debug purpose only
+func (s *Server) InjectPosition(ctx context.Context, p *gpssvc.Position) (*google_protobuf.Empty, error) {
+	s.RLock()
+	for _, c := range s.clients {
+		c <- p
+	}
+	s.RUnlock()
+	return &google_protobuf.Empty{}, nil
 }

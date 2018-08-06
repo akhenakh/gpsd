@@ -3,7 +3,13 @@ syntax = "proto3";
 import "google/protobuf/empty.proto";
 
 service GPSSVC {
+    // LivePosition streams Position updates
     rpc LivePosition(google.protobuf.Empty) returns (stream Position);
+    
+    // InjectPosition Inject fake position
+    // use it for debug purpose only
+    rpc InjectPosition(Position) returns (google.protobuf.Empty);
+    
 }
 
 message Position {

@@ -20,7 +20,6 @@ var (
 	speed     = flag.Int("speed", 38400, "Speed in bauds")
 	timeout   = flag.Duration("timeout", 4*time.Second, "Timeout in second")
 	osrmAddr  = flag.String("osmrAddr", "http://localhost:5000", "OSRM API address")
-	httpPort  = flag.Int("httpPort", 9401, "http port to listen")
 	grpcPort  = flag.Int("grpcPort", 9402, "grpc port to listen")
 	fakePath  = flag.String("fakePath", "", "fake NMEA data file for debug")
 	fakeCount = flag.Int("fakeCount", 3, "how many fake NMEA lines per sequences")
