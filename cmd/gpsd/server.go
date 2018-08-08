@@ -6,8 +6,8 @@ import (
 	"sync"
 	"time"
 
+	osrm "github.com/akhenakh/go.osrm"
 	"github.com/akhenakh/gpsd/gpssvc"
-	osrm "github.com/gojuno/go.osrm"
 	google_protobuf "github.com/golang/protobuf/ptypes/empty"
 	geo "github.com/paulmach/go.geo"
 	context "golang.org/x/net/context"
@@ -31,11 +31,84 @@ type Server struct {
 }
 
 func NewServer(pchan chan *gpssvc.Position, osrmAddr string) (*Server, error) {
-	return &Server{
-		c:          pchan,
-		quit:       make(chan struct{}),
-		osrmClient: osrm.NewFromURL(osrmAddr),
-	}, nil
+	s := &Server{
+		c:    pchan,
+		quit: make(chan struct{}),
+	}
+	if osrmAddr != "" {
+		s.osrmClient = osrm.NewFromURL(osrmAddr)
+	}
+
+	return s, nil
+}
+
+func (s *Server) mapNear(ctx context.Context, p *gpssvc.Position) error {
+	mctx, cancel := context.WithTimeout(ctx, 30*time.Millisecond)
+	defer cancel()
+
+	req := osrm.NearRequest{
+		Profile:  "car",
+		GeoPath:  *osrm.NewGeoPathFromPointSet(geo.PointSet{*geo.NewPointFromLatLng(p.Latitude, p.Longitude)}),
+		Number:   1,
+		Bearings: []osrm.Bearing{{Value: uint16(p.Heading), Range: 40}},
+	}
+
+	resp, err := s.osrmClient.Near(mctx, req)
+	if err != nil {
+		return err
+	}
+	if len(resp.Waypoints) == 1 {
+		p.Matched = true
+		p.MatchedLatitude = resp.Waypoints[0].Location.Lat()
+		p.MatchedLongitude = resp.Waypoints[0].Location.Lng()
+		p.MatchedDistance = float64(resp.Waypoints[0].Distance)
+		p.MatchedHeading = p.Heading
+		p.RoadName = resp.Waypoints[0].Name
+		if s.debug {
+			log.Println("map near position distance", p.MatchedLatitude, p.MatchedLongitude, p.MatchedDistance)
+		}
+	}
+	return nil
+}
+
+func (s *Server) mapMatch(ctx context.Context, p *gpssvc.Position) error {
+	mctx, cancel := context.WithTimeout(ctx, 30*time.Millisecond)
+	defer cancel()
+
+	ps := make(geo.PointSet, len(s.lastPositions))
+	for i := 0; i < len(s.lastPositions); i++ {
+		ps[i] = geo.Point{s.lastPositions[i].Longitude, s.lastPositions[i].Latitude}
+	}
+
+	req := osrm.MatchRequest{
+		Profile: "car",
+		// TODO: transform lastPositions to pointset
+		GeoPath:     *osrm.NewGeoPathFromPointSet(ps),
+		Annotations: osrm.AnnotationsTrue,
+	}
+
+	resp, err := s.osrmClient.Match(mctx, req)
+	if err != nil {
+		return err
+	}
+
+	if len(resp.Matchings) > 0 {
+		last := resp.Matchings[len(resp.Matchings)-1]
+		points := last.Geometry.Points()
+		if len(points) > 0 {
+			p.Matched = true
+			p.MatchedLatitude = points[0].Lat()
+			p.MatchedLongitude = points[0].Lng()
+			// TODO: p.MatchedHeading =
+			p.MatchedHeading = p.Heading
+			p.MatchedDistance = float64(last.Distance)
+			//log.Println(resp.Matchings[len(resp.Matchings)-1].Legs)
+			if s.debug {
+				log.Println("map matched position distance", points, last.Distance)
+			}
+		}
+	}
+	return nil
 }
 
 func (s *Server) Start() {
@@ -56,45 +129,17 @@ func (s *Server) Start() {
 					s.lastPositions = s.lastPositions[len(s.lastPositions)-keepPositionCount:]
 				}
 
-				// map match if possible
-				if len(s.lastPositions) > 2 {
-					ps := make(geo.PointSet, len(s.lastPositions))
-					for i := 0; i < len(s.lastPositions); i++ {
-						ps[i] = geo.Point{s.lastPositions[i].Longitude, s.lastPositions[i].Latitude}
-					}
-
-					mctx, cancel := context.WithTimeout(ctx, 50*time.Millisecond)
-					req := osrm.MatchRequest{
-						Profile: "car",
-						// TODO: transform lastPositions to pointset
-						GeoPath:     *osrm.NewGeoPathFromPointSet(ps),
-						Annotations: osrm.AnnotationsTrue,
-					}
-
-					resp, err := s.osrmClient.Match(mctx, req)
+				// near match
+				if s.osrmClient != nil {
+					err := s.mapNear(ctx, p)
 					if err != nil {
 						log.Println(err)
-					} else {
-
-						if len(resp.Matchings) > 0 {
-							last := resp.Matchings[len(resp.Matchings)-1]
-							points := last.Geometry.Points()
-							if len(points) > 0 {
-								p.Matched = true
-								p.MatchedLatitude = points[0].Lat()
-								p.MatchedLongitude = points[0].Lng()
-								// TODO: p.MatchedHeading =
-								p.MatchedHeading = p.Heading
-								p.MatchedDistance = float64(last.Distance)
-								log.Println(resp.Matchings[len(resp.Matchings)-1].Legs)
-								if *debug {
-									log.Println("matched position distance", points, last.Distance)
-								}
-							}
-						}
 					}
+				}
 
-					cancel()
+				// map match if possible
+				if len(s.lastPositions) > 10 {
+					//TODO: real map match
 				}
 
 				s.RLock()

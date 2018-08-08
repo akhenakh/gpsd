@@ -2,12 +2,23 @@
 
 
 [[projects]]
+  digest = "1:723954b5bb2e719368cba684881fe7359c4904ba5abb2b32327131ae13966d6e"
   name = "github.com/adrianmo/go-nmea"
   packages = ["."]
+  pruneopts = "UT"
   revision = "7ad7ee7443b869e2417d6af59228bb127c3978ef"
   version = "v1.0.0"
 
 [[projects]]
+  branch = "master"
+  digest = "1:3224dbd2c5c70921097831a8bcda979790fbbf66b85957e1efae6518e1ee92cb"
+  name = "github.com/akhenakh/go.osrm"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "687af393ed176a7afbedc4189a64bab9ef00a758"
+
+[[projects]]
+  digest = "1:0a6478c37f24385424d457d8f2d921dc9ff84156e021fe86c5cabe263db64930"
   name = "github.com/golang/protobuf"
   packages = [
     "proto",
@@ -15,19 +26,39 @@
     "ptypes/any",
     "ptypes/duration",
     "ptypes/empty",
-    "ptypes/timestamp"
+    "ptypes/timestamp",
   ]
+  pruneopts = "UT"
   revision = "b4deda0973fb4c70b50d226b1af49f3da59f5265"
   version = "v1.1.0"
 
 [[projects]]
+  digest = "1:1a887a5005071f452147c05ac66bb8cb5a33007529686bd4c11a21a3f70ebfb0"
+  name = "github.com/paulmach/go.geo"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "e8994de4ca767ad1e416ce5e185f83538f0661a8"
+  version = "v0.1"
+
+[[projects]]
+  digest = "1:9360e4c762cfa1adccb318cd9ece2a1e2c73260ca43126d95d92dcc50cc8243f"
+  name = "github.com/paulmach/go.geojson"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "aa3713dea4327980f5891ac781c6f1a45ea75c0f"
+  version = "v1.3.1"
+
+[[projects]]
   branch = "master"
+  digest = "1:b9b666a56e920eaa59ffea0d25a9b848d7073be13689c4a29d04e4a0f548a031"
   name = "github.com/tarm/serial"
   packages = ["."]
+  pruneopts = "UT"
   revision = "eaafced92e9619f03c72527efeab21e326f3bc36"
 
 [[projects]]
   branch = "master"
+  digest = "1:018091dab17e9cddf15d7706a6b50e26e6b05e125307a027699a4f862651f047"
   name = "golang.org/x/net"
   packages = [
     "context",
@@ -36,17 +67,21 @@
     "http2/hpack",
     "idna",
     "internal/timeseries",
-    "trace"
+    "trace",
   ]
+  pruneopts = "UT"
   revision = "1e491301e022f8f977054da4c2d852decd59571f"
 
 [[projects]]
   branch = "master"
+  digest = "1:fcf2b18db0af0f60d58e71ae8ed15555d46fdca3fc2529f65a14cef30ced981f"
   name = "golang.org/x/sys"
   packages = ["unix"]
+  pruneopts = "UT"
   revision = "9527bec2660bd847c050fda93a0f0c6dee0800bb"
 
 [[projects]]
+  digest = "1:a2ab62866c75542dd18d2b069fec854577a20211d7c0ea6ae746072a1dccdd18"
   name = "golang.org/x/text"
   packages = [
     "collate",
@@ -62,18 +97,22 @@
     "unicode/bidi",
     "unicode/cldr",
     "unicode/norm",
-    "unicode/rangetable"
+    "unicode/rangetable",
   ]
+  pruneopts = "UT"
   revision = "f21a4dfb5e38f5895301dc265a8def02365cc3d0"
   version = "v0.3.0"
 
 [[projects]]
   branch = "master"
+  digest = "1:3c24554c312721e98fa6b76403e7100cf974eb46b1255ea7fc6471db9a9ce498"
   name = "google.golang.org/genproto"
   packages = ["googleapis/rpc/status"]
+  pruneopts = "UT"
   revision = "81158efcc9f219c511e4d3c0d61a0e6e49c01a24"
 
 [[projects]]
+  digest = "1:faa17b4f3d818f32a10a5d8c69089f607b798fbfeda5d0aa0cbcf438e13b4347"
   name = "google.golang.org/grpc"
   packages = [
     ".",
@@ -99,14 +138,24 @@
     "stats",
     "status",
     "tap",
-    "transport"
+    "transport",
   ]
+  pruneopts = "UT"
   revision = "22a49e732a507a11ac524e4ea5fd1a3e384b6fb8"
   version = "v1.12.1"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "fff5dde2e2ffbfdf5f0f5cbdf1ef275c5fcae7287c97e4d516b93fd0680abbe4"
+  input-imports = [
+    "github.com/adrianmo/go-nmea",
+    "github.com/akhenakh/go.osrm",
+    "github.com/golang/protobuf/proto",
+    "github.com/golang/protobuf/ptypes/empty",
+    "github.com/paulmach/go.geo",
+    "github.com/tarm/serial",
+    "golang.org/x/net/context",
+    "google.golang.org/grpc",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1
