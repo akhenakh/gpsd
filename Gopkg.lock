@@ -11,11 +11,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:3224dbd2c5c70921097831a8bcda979790fbbf66b85957e1efae6518e1ee92cb"
+  digest = "1:3f3d3dc74ec2d83ac6b10a92c112c8da79cf5cb05a4f0aa39885f71e555bf001"
   name = "github.com/akhenakh/go.osrm"
   packages = ["."]
   pruneopts = "UT"
-  revision = "687af393ed176a7afbedc4189a64bab9ef00a758"
+  revision = "c192700e7961eba8431d764cc40b70aa1b9b301b"
 
 [[projects]]
   digest = "1:0a6478c37f24385424d457d8f2d921dc9ff84156e021fe86c5cabe263db64930"

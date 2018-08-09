@@ -46,14 +46,14 @@ func (s *Server) mapNear(ctx context.Context, p *gpssvc.Position) error {
 	mctx, cancel := context.WithTimeout(ctx, 30*time.Millisecond)
 	defer cancel()
 
-	req := osrm.NearRequest{
+	req := osrm.NearestRequest{
 		Profile:  "car",
 		GeoPath:  *osrm.NewGeoPathFromPointSet(geo.PointSet{*geo.NewPointFromLatLng(p.Latitude, p.Longitude)}),
 		Number:   1,
 		Bearings: []osrm.Bearing{{Value: uint16(p.Heading), Range: 40}},
 	}
 
-	resp, err := s.osrmClient.Near(mctx, req)
+	resp, err := s.osrmClient.Nearest(mctx, req)
 	if err != nil {
 		return err
 	}
