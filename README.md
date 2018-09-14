@@ -35,3 +35,6 @@ rpc LivePosition(google.protobuf.Empty) returns (stream Position);
 ```
 
 Look in `cmd/gpsc` for an example client.
+
+## Notes
+You need some privileges to use `adjustTime`, on Linux use root user or `sudo setcap cap_sys_time+ep /path/for/gpsd`.

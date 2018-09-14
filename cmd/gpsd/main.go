@@ -8,6 +8,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"syscall"
 	"time"
 
 	"github.com/akhenakh/gpsd/gpssvc"
@@ -16,20 +17,32 @@ import (
 )
 
 var (
-	device    = flag.String("device", "/dev/ttyACM0", "Device path")
-	speed     = flag.Int("speed", 38400, "Speed in bauds")
-	timeout   = flag.Duration("timeout", 4*time.Second, "Timeout in second")
-	osrmAddr  = flag.String("osmrAddr", "http://localhost:5000", "OSRM API address")
-	grpcPort  = flag.Int("grpcPort", 9402, "grpc port to listen")
-	fakePath  = flag.String("fakePath", "", "fake NMEA data file for debug")
-	fakeCount = flag.Int("fakeCount", 3, "how many fake NMEA lines per sequences")
-	logNMEA   = flag.Bool("logNMEA", false, "log all NMEA output in current directory")
-	debug     = flag.Bool("debug", false, "enable debug")
+	device     = flag.String("device", "/dev/ttyACM0", "Device path")
+	speed      = flag.Int("speed", 38400, "Speed in bauds")
+	timeout    = flag.Duration("timeout", 4*time.Second, "Timeout in second")
+	osrmAddr   = flag.String("osmrAddr", "http://localhost:5000", "OSRM API address")
+	grpcPort   = flag.Int("grpcPort", 9402, "grpc port to listen")
+	fakePath   = flag.String("fakePath", "", "fake NMEA data file for debug")
+	fakeCount  = flag.Int("fakeCount", 3, "how many fake NMEA lines per sequences")
+	logNMEA    = flag.Bool("logNMEA", false, "log all NMEA output in current directory")
+	adjustTime = flag.Bool("adjustTime", false, "adjust time from GPS")
+	debug      = flag.Bool("debug", false, "enable debug")
 )
 
 func main() {
 	log.SetFlags(log.Lshortfile | log.Ltime)
 	flag.Parse()
+
+	// adjustTime needs some privileges
+	// under Linux the CAP_SYS_TIME capability is required
+	if *adjustTime {
+		tv := &syscall.Timeval{}
+		syscall.Gettimeofday(tv)
+		err := syscall.Settimeofday(tv)
+		if err != nil {
+			log.Fatal("no priviles to set the date ", err)
+		}
+	}
 
 	c := &serial.Config{
 		Name:        *device,
