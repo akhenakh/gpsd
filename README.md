@@ -5,7 +5,9 @@ Used for my own car system project see [this blogpost](https://blog.nobugware.co
 
 ## Usage
 ```
-Usage of gpsd:
+Usage of ./cmd/gpsd/gpsd:
+  -adjustTime
+        adjust time from GPS
   -debug
         enable debug
   -device string
@@ -16,8 +18,6 @@ Usage of gpsd:
         fake NMEA data file for debug
   -grpcPort int
         grpc port to listen (default 9402)
-  -httpPort int
-        http port to listen (default 9401)
   -logNMEA
         log all NMEA output in current directory
   -osmrAddr string
