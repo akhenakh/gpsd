@@ -93,8 +93,7 @@ func main() {
 
 			for {
 				dr, err := serial.OpenPort(c)
-				var r io.Reader
-				r = dr
+				var r io.Reader = dr
 
 				if err != nil {
 					log.Println("can't open device retrying", err)
