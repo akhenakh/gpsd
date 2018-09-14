@@ -4,8 +4,6 @@ import (
 	"bufio"
 	"io"
 	"log"
-	"syscall"
-	"time"
 
 	nmea "github.com/adrianmo/go-nmea"
 	"github.com/akhenakh/gpsd/gpssvc"
@@ -44,13 +42,7 @@ func parseNMEA(r io.Reader, pchan chan *gpssvc.Position) error {
 				pos.Speed = v.Speed * 1.852001
 			}
 			if *adjustTime {
-				// we should normally take leap seconds into account but
-				// GPRMC returns leap seconds offsets without telling, after several time
-				// so do not use this for extra precision
-				t := time.Date(2000+v.Date.YY, time.Month(v.Date.MM), v.Date.DD, v.Time.Hour, v.Time.Minute, v.Time.Second, 0, time.UTC)
-				log.Println(t)
-				// if err we silent it
-				syscall.Settimeofday(&syscall.Timeval{Sec: t.Unix()})
+				setTime(v)
 			}
 		case nmea.GPGGA:
 			pos.Latitude = v.Latitude
