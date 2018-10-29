@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net"
+	"net/http"
 	"os"
 	"syscall"
 	"time"
@@ -20,8 +21,9 @@ var (
 	device     = flag.String("device", "/dev/ttyACM0", "Device path")
 	speed      = flag.Int("speed", 38400, "Speed in bauds")
 	timeout    = flag.Duration("timeout", 4*time.Second, "Timeout in second")
-	osrmAddr   = flag.String("osmrAddr", "http://localhost:5000", "OSRM API address")
-	grpcPort   = flag.Int("grpcPort", 9402, "grpc port to listen")
+	osrmAddr   = flag.String("osrmAddr", "", "OSRM API address")
+	grpcPort   = flag.Int("grpcPort", 9402, "gRPC port to listen")
+	httpPort   = flag.Int("httpPort", 9403, "HTTP port to listen")
 	fakePath   = flag.String("fakePath", "", "fake NMEA data file for debug")
 	fakeCount  = flag.Int("fakeCount", 3, "how many fake NMEA lines per sequences")
 	logNMEA    = flag.Bool("logNMEA", false, "log all NMEA output in current directory")
@@ -78,9 +80,6 @@ func main() {
 				}
 				line := scanner.Text() + "\r\n"
 				cr.Input <- line
-				if *debug {
-					log.Println(line)
-				}
 				i++
 			}
 
@@ -138,6 +137,12 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
+
+	http.HandleFunc("/sse", s.SSEHandler)
+
+	go func() {
+		http.ListenAndServe(fmt.Sprintf(":%d", *httpPort), nil)
+	}()
 
 	grpcServer := grpc.NewServer()
 	gpssvc.RegisterGPSSVCServer(grpcServer, s)

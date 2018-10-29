@@ -5,6 +5,8 @@ import (
 	"io"
 	"log"
 
+	"github.com/golang/protobuf/ptypes"
+
 	nmea "github.com/adrianmo/go-nmea"
 	"github.com/akhenakh/gpsd/gpssvc"
 )
@@ -47,11 +49,11 @@ func parseNMEA(r io.Reader, pchan chan *gpssvc.Position) error {
 		case nmea.GPGGA:
 			pos.Latitude = v.Latitude
 			pos.Longitude = v.Longitude
-			// TODO: compute HorizontalPrecision
-			pos.HorizontalPrecision = v.HDOP
-			if *debug {
-				log.Println(pos)
-			}
+			// compute Horizontal Precision
+			// assuming a pessimistic 5 meters precisions
+			pos.HorizontalPrecision = v.HDOP * 5
+
+			pos.Ts = ptypes.TimestampNow()
 
 			// on some GPS GPGGA is the latest the order
 			// can't find any docs about sentences ordering ..

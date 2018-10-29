@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
 
 service GPSSVC {
     // LivePosition streams Position updates
@@ -9,7 +10,6 @@ service GPSSVC {
     // InjectPosition Inject fake position
     // use it for debug purpose only
     rpc InjectPosition(Position) returns (google.protobuf.Empty);
-    
 }
 
 message Position {
@@ -19,13 +19,17 @@ message Position {
     double heading = 3;
     // speed in km/h, ground speed when available
     double speed = 4;
+    // approximating precisions in meters
     double horizontal_precision = 5;
+
+    google.protobuf.Timestamp ts = 6;
     
     // matched data
-    bool matched = 6;
-    double matched_latitude = 7;
-    double matched_longitude = 8;
-    double matched_heading = 9;
-    double matched_distance = 10;
-    string road_name = 11;
+    bool matched = 7;
+    double matched_latitude = 8;
+    double matched_longitude = 9;
+    double matched_heading = 10;
+    double matched_distance = 11;
+    string road_name = 12;
+    string hint = 13;
 }
