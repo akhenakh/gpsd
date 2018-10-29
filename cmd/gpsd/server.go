@@ -289,7 +289,7 @@ Loop:
 			// Server Sent Events compatible
 			data, _ := json.Marshal(p)
 
-			fmt.Fprintf(rw, "data: %s\n\n", data)
+			fmt.Fprintf(rw, "event: position\ndata: %s\n\n", data)
 			// Flush the data inmediatly instead of buffering it for later.
 			flusher.Flush()
 		}
