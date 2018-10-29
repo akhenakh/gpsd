@@ -57,10 +57,10 @@ func (s *Server) mapNear(ctx context.Context, p *gpssvc.Position) error {
 	defer cancel()
 
 	req := osrm.NearestRequest{
-		Profile:  "car",
-		GeoPath:  *osrm.NewGeoPathFromPointSet(geo.PointSet{*geo.NewPointFromLatLng(p.Latitude, p.Longitude)}),
-		Number:   1,
-		Bearings: []osrm.Bearing{{Value: uint16(p.Heading), Range: searchBearing}},
+		Profile:     "car",
+		Coordinates: osrm.NewGeometryFromPointSet(geo.PointSet{*geo.NewPointFromLatLng(p.Latitude, p.Longitude)}),
+		Number:      1,
+		Bearings:    []osrm.Bearing{{Value: uint16(p.Heading), Range: searchBearing}},
 	}
 
 	resp, err := s.osrmClient.Nearest(mctx, req)
@@ -126,8 +126,8 @@ func (s *Server) mapMatch(ctx context.Context, p *gpssvc.Position, latestPos []*
 	}
 
 	req := osrm.MatchRequest{
-		Profile: "car",
-		GeoPath: *osrm.NewGeoPathFromPointSet(ps),
+		Profile:     "car",
+		Coordinates: osrm.NewGeometryFromPointSet(ps),
 		//Annotations: osrm.AnnotationsTrue,
 		//Overview:    osrm.OverviewFull,
 		Radiuses:   radiuses,

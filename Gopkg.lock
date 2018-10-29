@@ -11,11 +11,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:3f3d3dc74ec2d83ac6b10a92c112c8da79cf5cb05a4f0aa39885f71e555bf001"
+  digest = "1:4ddeecf0fe199d57b78c969bbccc4f6959b99ec9ffb18c3b8629f96361e5eb75"
   name = "github.com/akhenakh/go.osrm"
   packages = ["."]
   pruneopts = "UT"
-  revision = "c192700e7961eba8431d764cc40b70aa1b9b301b"
+  revision = "e69b46df7e3205fb1c60b062818002860e5a67f1"
 
 [[projects]]
   digest = "1:0a6478c37f24385424d457d8f2d921dc9ff84156e021fe86c5cabe263db64930"
@@ -47,6 +47,14 @@
   pruneopts = "UT"
   revision = "aa3713dea4327980f5891ac781c6f1a45ea75c0f"
   version = "v1.3.1"
+
+[[projects]]
+  digest = "1:40e195917a951a8bf867cd05de2a46aaf1806c50cf92eebf4c16f78cd196f747"
+  name = "github.com/pkg/errors"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
+  version = "v0.8.0"
 
 [[projects]]
   branch = "master"
@@ -151,8 +159,11 @@
     "github.com/adrianmo/go-nmea",
     "github.com/akhenakh/go.osrm",
     "github.com/golang/protobuf/proto",
+    "github.com/golang/protobuf/ptypes",
     "github.com/golang/protobuf/ptypes/empty",
+    "github.com/golang/protobuf/ptypes/timestamp",
     "github.com/paulmach/go.geo",
+    "github.com/pkg/errors",
     "github.com/tarm/serial",
     "golang.org/x/net/context",
     "google.golang.org/grpc",
